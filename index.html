@@ -56,11 +56,16 @@ function render(){
  $('explain').textContent=!first?'No resting order crosses this limit.':equal?'All prices tie, so A wins with the earliest acceptance sequence.':`B offers the better ${incoming.side==='buy'?'lower ask':'higher bid'}. Price beats A’s earlier arrival. A then precedes C at price 100.`;
  $('trace').innerHTML=fills.map(f=>`<li><strong>${f.id}</strong>: ${f.qty} units at ${f.price} (accepted #${f.seq})</li>`).join('');
  $('status').innerHTML=`<span class="result">${remaining} incoming units remain</span><br>${shown<result.fills.length?`Next: ${next.id}, ${next.qty} units at ${next.price}.` : remaining?'Stopped: no more eligible resting quantity.':'Incoming order filled.'}`;
- $('step').disabled=$('all').disabled=shown>=result.fills.length;
+ $('step').disabled=$('all').disabled=result.fills.length===0;
+ $('step').textContent=shown>=result.fills.length?'Replay first fill':'Fill next resting order';
+ $('all').textContent=shown>=result.fills.length?'Replay all fills':'Run all fills';
  const bad=match(orders,incoming,'time-only');
  $('bad').innerHTML=`<p class="result">${bad.fills.map(f=>`${f.id}: ${f.qty} at ${f.price}`).join(' → ')||'No fill'}</p><p>Correct price-time result: ${result.fills.map(f=>`${f.id}: ${f.qty} at ${f.price}`).join(' → ')||'No fill'}. ${equal?'Here the two policies agree because every price ties.':'Time alone can select an earlier but worse-priced resting order.'}</p>`;
  $('challenge').textContent=equal?'If C had been accepted before A at the same price, which order would go first?':'What price would A need to offer to move ahead of B? What if A and B have the same price?';
 }
 document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>{scenario=b.dataset.case;document.querySelectorAll('[data-case]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b));});$('qty').value=scenario==='partial'?10:2;$('limit').value=$('side').value==='buy'?101:99;setup();});
-$('side').onchange=()=>{$('limit').value=$('side').value==='buy'?101:99;setup();};$('apply').onclick=()=>setup();$('equal').onclick=()=>setup(true);$('reset').onclick=()=>setup();$('step').onclick=()=>{shown++;render();};$('all').onclick=()=>{shown=result.fills.length;render();};setup();
+$('side').onchange=()=>{$('limit').value=$('side').value==='buy'?101:99;setup();};$('apply').onclick=()=>setup();$('equal').onclick=()=>setup(true);$('reset').onclick=()=>setup();$('step').onclick=()=>{shown=shown>=result.fills.length?1:shown+1;render();};$('all').onclick=()=>{shown=result.fills.length;render();};setup();
+const feedback=document.createElement('p');feedback.className='notice';feedback.id='click-feedback';feedback.setAttribute('aria-live','polite');feedback.textContent='Ready. Choose a scenario, then fill an order.';document.querySelector('.controls').append(feedback);
+let clickCount=0;document.addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;clickCount++;feedback.textContent='Action '+clickCount+': '+button.textContent.trim()+'. '+$('status').textContent;});
+window.addEventListener('error',event=>{$('error').textContent='The demo hit an error: '+event.message;});
 </script></main></body></html>
