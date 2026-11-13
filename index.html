@@ -17,10 +17,10 @@ import {match} from './engine.mjs';
 const $=id=>document.getElementById(id);let scenario='price',orders=[],incoming={},result,shown=0;
 function setup(equal=false){
  const sell=$('side').value==='sell';const same=scenario==='time'||equal;
- orders=[{id:'A',seq:1,price:100,qty:5},{id:'B',seq:2,price:same?100:sell?101:99,qty:4},{id:'C',seq:3,price:100,qty:3}];
- incoming={side:$('side').value,limit:Number($('limit').value),qty:Number($('qty').value)};
- if(incoming.limit>1000000||incoming.qty>1000000){$('error').textContent='Please use values between 1 and 1,000,000.';return;}
- try{result=match(orders,incoming);$('error').textContent='';shown=0;render();}catch(e){$('error').textContent=e.message;}
+ const nextOrders=[{id:'A',seq:1,price:100,qty:5},{id:'B',seq:2,price:same?100:sell?101:99,qty:4},{id:'C',seq:3,price:100,qty:3}];
+ const candidate={side:$('side').value,limit:Number($('limit').value),qty:Number($('qty').value)};
+ if(candidate.limit>1000000||candidate.qty>1000000){$('error').textContent='Please use values between 1 and 1,000,000.';return;}
+ try{const nextResult=match(nextOrders,candidate);orders=nextOrders;incoming=candidate;result=nextResult;$('error').textContent='';shown=0;render();}catch(e){$('error').textContent=e.message;}
 }
 function render(){
  const fills=result.fills.slice(0,shown);const remaining=incoming.qty-fills.reduce((s,f)=>s+f.qty,0);const next=result.fills[shown];
