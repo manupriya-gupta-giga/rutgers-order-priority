@@ -22,7 +22,7 @@ No dependencies, API keys, backend or market data. Download/clone the repository
 python3 -m http.server 8000
 ```
 
-Open http://localhost:8000. Use a local server because the page imports an ES module.
+Open http://localhost:8000. The webpage is self-contained and also works by opening index.html directly. A local server is optional.
 
 Run the matching-engine checks with Node.js 18+:
 
@@ -32,7 +32,7 @@ node test.mjs
 
 ## Small starter engine
 
-`engine.mjs` exports `match(orders, incoming, policy)`. Resting orders have `id`, `seq`, `price`, and `qty`. The incoming order has `side`, `limit`, and `qty`. Results contain fills, unfilled incoming quantity, and the remaining resting book. Inputs are not mutated. The UI and checks use the same engine.
+`engine.mjs` exports `match(orders, incoming, policy)`. Resting orders have `id`, `seq`, `price`, and `qty`. The incoming order has `side`, `limit`, and `qty`. Results contain fills, unfilled incoming quantity, and the remaining resting book. Inputs are not mutated. The page embeds the same engine inline so there is no runtime module fetch. The checks use engine.mjs.
 
 ## Audience challenges
 
